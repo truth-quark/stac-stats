@@ -65,9 +65,9 @@ masking_band = "scl"
 resolution = 10
 
 
-product = "2016-present"
+product = "2016-Jan-Aug-10m"
 s3_bucket = "dea-dme-dev"
-s3_prefix = "products/solomons/geomad"
+s3_prefix = "products/solomons/imam/geomad"
 
 chunks = {"x": 1000, "y": 1000}
 threads_per_chunk = 4
