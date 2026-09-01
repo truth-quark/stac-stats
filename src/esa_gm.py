@@ -208,36 +208,38 @@ def write_input_data(ds):
             )
 
 
-def write_geomedian(gm, region_code, upload=False):
-    if upload:
-        s3_client = boto3.client("s3")
-    else:
-        s3_client = None
-
+def write_geomedian(gm, region_code, upload=True):
     root = Path("/output")
     folder = f"esa_s2_gm/{region_code}"
     (root / folder).mkdir(parents=True, exist_ok=True)
 
     for band in measurements:
         filename = f"{folder}/gm_{product}_{region_code}_{band}.tif"
-        on_disk = str(root / filename)
         write_cog(
             gm[band],
-            on_disk,
+            str(root / filename),
             overwrite=True,
             compress="zstd",
             zstd_level=16,
             predictor=3,
         )
-        if upload:
-            s3_client.upload_file(on_disk, s3_bucket, f"{s3_prefix}/{filename}")
 
     filename = f"{folder}/gm_{product}_{region_code}.completed"
-    on_disk = str(root / filename)
-    with open(on_disk, "w") as fl:
+    with open(root / filename, "w") as fl:
         print("done!", file=fl)
-    if upload:
-        s3_client.upload_file(on_disk, s3_bucket, f"{s3_prefix}/{filename}")
+
+    if not upload:
+        return
+
+    s3_client = boto3.client("s3")
+    for band in measurements:
+        filename = f"{folder}/gm_{product}_{region_code}_{band}.tif"
+        s3_client.upload_file(
+            str(root / filename), s3_bucket, f"{s3_prefix}/{filename}"
+        )
+
+    filename = f"{folder}/gm_{product}_{region_code}.completed"
+    s3_client.upload_file(str(root / filename), s3_bucket, f"{s3_prefix}/{filename}")
 
 
 def check_exists(region_code):
@@ -253,6 +255,7 @@ def check_exists(region_code):
 
 def execute_task(region_code, meta: TaskMetaData):
     ncpus = multiprocessing.cpu_count()
+    num_workers = int(ncpus / threads_per_chunk)
     configure_rio(cloud_defaults=True)
 
     bbox = bounds(extract_feature(region_code))
@@ -264,8 +267,8 @@ def execute_task(region_code, meta: TaskMetaData):
     # write_input_data(ds)
     log("geomedian", datetime.now())
     gm = xr_geomedian(ds, num_threads=threads_per_chunk)
-    log("compute", datetime.now())
-    computed = gm.load(scheduler="threads", num_workers=int(ncpus / threads_per_chunk))
+    log("compute with", ncpus, "cpus", num_workers, "workers", datetime.now())
+    computed = gm.load(scheduler="threads", num_workers=num_workers)
     log("writing", datetime.now())
     write_geomedian(assign_crs(computed, crs=output_crs), region_code)
 
