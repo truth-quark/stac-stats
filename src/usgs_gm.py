@@ -66,7 +66,7 @@ def rewrite_asset_urls(in_url):
 
 
 def extract_feature(region_code):
-    with open("/src/gm_polygons.geojson") as fl:
+    with open("/src/wrs2.geojson") as fl:
         data = json.load(fl)
 
     features = data["features"]

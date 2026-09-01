@@ -73,7 +73,7 @@ chunks = {"x": 1000, "y": 1000}
 threads_per_chunk = 4
 
 
-meta = TaskMetaData(start_date="2026-01-01", end_date="2026-12-31")
+meta = TaskMetaData(start_date="2026-01-01", end_date="2026-08-31")
 
 
 def log(*args, **kwargs):
@@ -93,7 +93,7 @@ def write_tasks_list(tasks_list):
 
 
 def extract_feature(region_code):
-    with open("/src/gm_polygons.geojson") as fl:
+    with open("/src/mgrs.geojson") as fl:
         data = json.load(fl)
 
     features = data["features"]
