@@ -216,7 +216,14 @@ def write_geomedian(gm, region_code, upload=False):
     for band in measurements:
         filename = f"{folder}/gm_{product}_{region_code}_{band}.tif"
         on_disk = str(root / filename)
-        write_cog(gm[band], on_disk, overwrite=True)
+        write_cog(
+            gm[band],
+            on_disk,
+            overwrite=True,
+            compress="zstd",
+            zstd_level=16,
+            predictor=3,
+        )
         if upload:
             s3_client.upload_file(on_disk, s3_bucket, f"{s3_prefix}/{filename}")
 
