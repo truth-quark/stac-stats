@@ -31,4 +31,4 @@ RUN mkdir -p /output
 COPY src/ /src/
 WORKDIR /src
 
-RUN odc-stats --version
+RUN datacube --version
