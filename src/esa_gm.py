@@ -65,7 +65,7 @@ masking_band = "scl"
 resolution = 10
 
 
-product = "2016-Jan-Aug-10m"
+product = "2026-Jan-Aug-10m"
 s3_bucket = "dea-dme-dev"
 s3_prefix = "products/solomons/imam/geomad"
 
