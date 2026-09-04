@@ -71,7 +71,7 @@ masking_band = "scl"
 resolution = 20
 
 s3_bucket = "dea-dme-dev"
-s3_prefix = "products/solomons/geomad"
+s3_prefix = "data_investigation/geomedian"
 
 chunks = {"x": 1000, "y": 1000}
 threads_per_chunk = 4
